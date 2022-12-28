@@ -5,11 +5,14 @@ import { onAuthStateChanged } from 'firebase/auth'
 import { signOut } from 'firebase/auth'
 import Button from './Button'
 import { uid } from 'uid'
-import { onValue, ref, remove, set } from 'firebase/database'
+import { onValue, ref, remove, set, update } from 'firebase/database'
 import { Add } from './todo'
+import Input from './Input'
 const HomePage = () => {
     const [todo, setTodo] = useState('');
     const [allTodos, setAllTodos] = useState([]);
+    const [isEdit, setIsEdit] = useState(false);
+    const [tempUidd,setTempUidd]=useState('');
 
     const navigate = useNavigate()
     useEffect(() => {
@@ -43,29 +46,59 @@ const HomePage = () => {
         });
         setTodo('');
     }
-    const handleUpdate = () => {
+    const handleUpdate = (todo) => {
+        setIsEdit(true);
+        setTodo(todo.todo);
+        setTempUidd(todo.uidd);
+      };
+      const handleEditConfirm = () => {
+        update(ref(db, `/${auth.currentUser.uid}/${tempUidd}`), {
+          todo: todo,
+          tempUidd: tempUidd
+        });
+    
+        setTodo("");
+        setIsEdit(false);
+      };
 
-    }
+
     const handleDeletion = (uid) => {
         remove(ref(db, `/${auth.currentUser.uid}/${uid}`));
     }
+
+    
+    
     return (
         <>
             <div>HomePage</div>
             {/* add task */}
             <Add type={'text'} changed={(e) => setTodo(e.target.value)} currValue={todo} label={'Add an Task'} clicked={handlePushToDB} textHolder={'+'} />
+            
+           
             {/* render tasks */}
             {
                 allTodos.map((todo) => (
                     <div className="">
                         <h1>{todo.todo}</h1>
-                        <Button color='blue' clicked={handleUpdate} value={'update'} />
+                        <Button color='blue' clicked={()=>handleUpdate(todo)} value={'update'} />
                         {/* delete task */}<Button color='black' clicked={() => handleDeletion(todo.uidd)} value={'delete'} />
                     </div>
                 ))
             }
+            {
+                isEdit?(
+                    <div>
+                        <Button color={'black'} clicked={handleEditConfirm} value={'Confirm'}/>
+                    </div>
+                )
+                :(
+                    <div>
+                        <Button color={'blue'} clicked={handlePushToDB} value={'Add'}/>
+                    </div>
+                )
+            }
             <Button
-                color={'black'}
+                color={'link'}
                 clicked={handleSignOut}
                 value={'sign out'} />
         </>

@@ -5,16 +5,27 @@ import { onAuthStateChanged } from 'firebase/auth'
 import { signOut } from 'firebase/auth' 
 import Button from './Button'
 import { uid } from 'uid'
-import { ref, set} from 'firebase/database'
+import { onValue, ref, set} from 'firebase/database'
 import { Add } from './todo'
 const HomePage = () => {
     const [todo,setTodo]=useState('');
-
+    const [allTodos,setAllTodos]=useState([]);
 
     const navigate=useNavigate()
     useEffect(() => {
         auth.onAuthStateChanged((user) => {
-            if (!user) {
+            if(user){
+                onValue(ref(db,`/${auth.currentUser.uid}`),(snapshot)=>{
+                    setAllTodos([]);
+                    const data = snapshot.val();
+                    if(data!==null){
+                        Object.values(data).map((todo)=>{
+                            setAllTodos((oldArray)=>[...oldArray,todo]);
+                        })
+                    }
+                });
+            }
+            else if (!user) {
                 navigate('/')
             }
         })
@@ -36,6 +47,16 @@ const HomePage = () => {
     <>
     <div>HomePage</div>
     <Add type={'text'} changed={(e)=>setTodo(e.target.value)} currValue={todo} label={'Add an Task'} clicked={handlePushToDB} textHolder={'+'}/>
+    {
+        allTodos.map((todo)=>(
+            <div className="">
+                <h1>{todo.todo}</h1>
+                
+                <button>edit</button>
+                <button>delete</button>
+            </div>
+        ))
+    }
     <Button
     color={'black'} 
     clicked={handleSignOut}

@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import Input from './Input'
-import Button from './Button'
+import { Input, Button } from '../operands'
 import { signInWithEmailAndPassword, onAuthStateChanged, createUserWithEmailAndPassword } from 'firebase/auth'
-import { auth } from '../firebase'
+import { auth } from '../../firebase'
 import { useNavigate } from 'react-router-dom'
 const Login = () => {
     const [email, setEmail] = useState('')

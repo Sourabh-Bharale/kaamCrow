@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import { auth, db } from '../firebase'
+import { auth, db } from '../../firebase'
 import { useNavigate } from 'react-router-dom'
 import { signOut } from 'firebase/auth'
-import Button from './Button'
 import { uid } from 'uid'
 import { onValue, ref, remove, set, update } from 'firebase/database'
-import { Add } from './todo'
-
-
+import { Input,Button } from '../operands'
 
 const HomePage = () => {
 
@@ -81,7 +78,7 @@ const HomePage = () => {
     return (
         <>
             {/* add task */}
-            <Add type={'text'} changed={(e) => setTodo(e.target.value)} currValue={todo} label={'Add an Task'} clicked={handlePushToDB} textHolder={'+'} />
+            <Input type={'text'} changed={(e) => setTodo(e.target.value)} currValue={todo} label={'Add an Task'}/>
             
            
             {/* render tasks */}
